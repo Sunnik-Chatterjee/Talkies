@@ -1,6 +1,5 @@
 package com.example.talkies.state
 
-import com.example.talkies.data.model.PhoneAuthUser
 
 sealed interface UiState<out T> {
     data object Idle : UiState<Nothing>

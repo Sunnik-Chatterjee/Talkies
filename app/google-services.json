@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "881183700980",
+    "firebase_url": "https://talkies-ddeb9-default-rtdb.firebaseio.com",
+    "project_id": "talkies-ddeb9",
+    "storage_bucket": "talkies-ddeb9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:881183700980:android:840ec32cdb26a7f6a56ba1",
+        "android_client_info": {
+          "package_name": "com.example.talkies"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "881183700980-02rv8etdk5s50nk2q95kppupkh7umi57.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.talkies",
+            "certificate_hash": "6294e82285f60effea62ceeac0498f3fd31f3a1c"
+          }
+        },
+        {
+          "client_id": "881183700980-lgf6po32vmekmacq1nmud0b92doqqemm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsosVPgiLeHhaJ-FyHETZNgIKRlvctEL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "881183700980-lgf6po32vmekmacq1nmud0b92doqqemm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
