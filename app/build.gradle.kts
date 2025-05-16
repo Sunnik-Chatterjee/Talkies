@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.talkies"
-        minSdk = 30
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -65,7 +65,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
-    implementation("com.google.android.gms:play-services-auth:20.6.0")
+    implementation ("com.google.android.gms:play-services-auth:20.6.0")
 
     // Add the dependency for the Firebase Authentication library
     implementation("com.google.firebase:firebase-auth-ktx")
@@ -102,14 +102,19 @@ dependencies {
     //coil
     implementation("io.coil-kt:coil-compose:2.5.0")
 
-    implementation("androidx.media3:media3-exoplayer:1.2.0")
-    implementation("androidx.media3:media3-ui:1.2.0")
+    //ZWing
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.31.3-beta")
+    implementation ("androidx.media3:media3-exoplayer:1.2.0")
+    implementation ("androidx.media3:media3-ui:1.2.0")
 
-    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.31.3-beta")
 
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation ("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
 
-    implementation("androidx.navigation:navigation-compose:2.7.7") // Use the latest version
+    implementation ("androidx.core:core-splashscreen:1.0.1")
+
+    implementation ("androidx.navigation:navigation-compose:2.7.7") // Use the latest version
+    implementation ("androidx.compose.animation:animation:1.6.3")
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
 }

@@ -31,8 +31,13 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
     private val _authState = MutableStateFlow<UiState<PhoneAuthUser>>(UiState.Idle)
     val authState = _authState.asStateFlow()
-
+    private val _autoRetrievedOtp = MutableStateFlow("")
+    val autoRetrievedOtp = _autoRetrievedOtp.asStateFlow()
     private val userRef = database.reference.child("users")
+
+    fun onOtpEntered(otp: String) {
+        _autoRetrievedOtp.value = otp
+    }
 
     fun sendVerificationCode(phoneNumber: String, activity: Activity) {
         _authState.value = UiState.Loading
@@ -44,9 +49,11 @@ class LoginViewModel @Inject constructor(
             }
 
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+                credential.smsCode?.let { code ->
+                    _autoRetrievedOtp.value = code  // <-- Set the auto-detected OTP here
+                }
                 signInWithCredentials(credential, context = activity)
             }
-
             override fun onVerificationFailed(exception: FirebaseException) {
                 Log.e("PhoneAuth", "Verification Failed: ${exception.message}")
                 _authState.value = UiState.Failed(exception.message ?: "Verification failed")
@@ -139,5 +146,6 @@ class LoginViewModel @Inject constructor(
         val sharedPreference = activity.getSharedPreferences("app_pref", Activity.MODE_PRIVATE)
         sharedPreference.edit { putBoolean("isSigned", false) }
     }
+
 
 }
