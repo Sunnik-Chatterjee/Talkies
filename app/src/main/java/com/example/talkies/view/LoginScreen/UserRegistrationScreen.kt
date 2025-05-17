@@ -1,5 +1,6 @@
 package com.example.talkies.view.LoginScreen
 
+import com.example.talkies.vm.LoginViewModel
 import android.app.Activity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
@@ -10,12 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -27,6 +30,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -51,29 +54,45 @@ import com.example.talkies.R
 import com.example.talkies.navigation.Screens
 import com.example.talkies.state.UiState
 import com.example.talkies.view.Util.CountryData
-import com.example.talkies.vm.LoginViewModel
 
 @Composable
-
 fun UserRegistrationScreen(
     navController: NavHostController,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel
 ) {
-
     val authState by viewModel.authState.collectAsState()
     val context = LocalContext.current
     val activity = LocalActivity.current as Activity
     val haptic = LocalHapticFeedback.current
 
-
-    var expanded by remember {
-        mutableStateOf(false)
-    }
+    var expanded by remember { mutableStateOf(false) }
     var selectedCountry by remember {
         mutableStateOf(CountryData.countries.first { it.name == "India" })
     }
     var wrongNumberInput by remember { mutableStateOf(false) }
     var phoneNumber by remember { mutableStateOf("") }
+    var isSendingOtp by remember { mutableStateOf(false) }
+
+    // Handle navigation when code is sent
+    LaunchedEffect(authState) {
+        when (authState) {
+            is UiState.CodeSent -> {
+                navController.navigate("${Screens.OtpScreen.routes}/${phoneNumber}/${selectedCountry.code}") {
+                    popUpTo(Screens.UserRegistrationScreen.routes) {
+                        inclusive = false
+                    }
+                }
+                isSendingOtp = false
+            }
+
+            is UiState.Failed -> {
+                isSendingOtp = false
+            }
+
+            else -> {}
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -87,112 +106,167 @@ fun UserRegistrationScreen(
             color = colorResource(id = R.color.purple_500),
             fontWeight = FontWeight.Bold
         )
+
         Spacer(modifier = Modifier.height(18.dp))
+
         Text(
-            "Talkies will send an sms message to verify your phone number. " +
-                    "Enter your country and phone number",
+            text = "Talkies will send an SMS message to verify your phone number.",
             textAlign = TextAlign.Center,
             color = colorResource(R.color.purple_200)
         )
-        Spacer(modifier = Modifier.width(4.dp))
-        TextButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth()) {
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Country Selection Dropdown
+        TextButton(
+            onClick = { expanded = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Box(modifier = Modifier.width(230.dp)) {
                 Text(
-                    selectedCountry.name, modifier = Modifier.align(Alignment.Center),
-                    fontSize = 16.sp, color = Color.White
+                    text = selectedCountry.name,
+                    modifier = Modifier.align(Alignment.Center),
+                    fontSize = 16.sp,
+                    color = Color.White
                 )
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = null,
-                    modifier = Modifier.align(
-                        Alignment.CenterEnd,
-                    ),
+                    contentDescription = "Select country",
+                    modifier = Modifier.align(Alignment.CenterEnd),
                     tint = colorResource(R.color.purple_200)
                 )
             }
         }
+
         HorizontalDivider(
             modifier = Modifier.padding(horizontal = 66.dp),
             thickness = 2.dp,
             color = colorResource(R.color.purple_200)
         )
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
             CountryData.countries.forEach { country ->
-                DropdownMenuItem(text = { Text(country.name) }, onClick = {
-                    selectedCountry = country
-                    expanded = false
-                })
+                DropdownMenuItem(
+                    text = { Text(text = country.name) },
+                    onClick = {
+                        selectedCountry = country
+                        expanded = false
+                    }
+                )
             }
         }
-        Column(
+
+        // Phone Number Input
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row {
-                TextField(
-                    value = selectedCountry.code,
-                    onValueChange = {},
-                    readOnly = true,
-                    modifier = Modifier.width(70.dp),
-                    singleLine = true,
-                    textStyle = LocalTextStyle.current.copy(fontSize = 18.sp),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedIndicatorColor = colorResource(R.color.purple_200),
-                        focusedIndicatorColor = colorResource(R.color.purple_200)
-                    )
+            TextField(
+                value = selectedCountry.code,
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier.width(70.dp),
+                singleLine = true,
+                textStyle = LocalTextStyle.current.copy(fontSize = 18.sp),
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedIndicatorColor = colorResource(R.color.purple_200),
+                    focusedIndicatorColor = colorResource(R.color.purple_200)
                 )
-                Spacer(modifier = Modifier.width(7.dp))
-                TextField(
-                    value = phoneNumber,
-                    onValueChange = { newnumber ->
-                        if (newnumber.length <= selectedCountry.phoneLength && newnumber.all { it.isDigit() })
-                            phoneNumber = newnumber
-                    },
-                    placeholder = { Text("Phone Number") },
-                    singleLine = true,
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedIndicatorColor = colorResource(R.color.purple_200),
-                        focusedIndicatorColor = colorResource(R.color.purple_200)
-                    ),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                "Carrier charges may apply",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
-            if (wrongNumberInput) {
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            TextField(
+                value = phoneNumber,
+                onValueChange = { newNumber ->
+                    if (newNumber.length <= selectedCountry.phoneLength && newNumber.all { it.isDigit() }) {
+                        phoneNumber = newNumber
+                        wrongNumberInput = false
+                    }
+                },
+                placeholder = { Text("Phone number") },
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedIndicatorColor = colorResource(R.color.purple_200),
+                    focusedIndicatorColor = colorResource(R.color.purple_200)
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Carrier charges may apply",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+
+        // Error Messages
+        if (wrongNumberInput) {
+            Text(
+                text = "Please enter a valid ${selectedCountry.name} phone number (${selectedCountry.phoneLength} digits)",
+                color = Color.Red,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+
+        when (val state = authState) {
+            is UiState.Failed -> {
                 Text(
-                    "Please give the correct number",
+                    text = state.message,
                     color = Color.Red,
-                    fontWeight = FontWeight.Bold
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
-            Spacer(modifier = Modifier.height(20.dp))
-            Button(onClick = {
+
+            else -> {}
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Send OTP Button
+        Button(
+            onClick = {
                 if (phoneNumber.length != selectedCountry.phoneLength) {
                     wrongNumberInput = true
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                } else {
-                    val fullphoneNumber = "${selectedCountry.code}${phoneNumber}"
-                    viewModel.sendVerificationCode(fullphoneNumber, activity)
-                    if(authState is UiState.CodeSent) {
-                        navController.navigate("${Screens.OtpScreen.routes}/${phoneNumber}/${selectedCountry.code}")
-                    }
+                    return@Button
                 }
-            }, shape = RoundedCornerShape(6.dp)) {
+
+                wrongNumberInput = false
+                isSendingOtp = true
+                val fullPhoneNumber = "${selectedCountry.code}${phoneNumber}"
+                viewModel.sendVerificationCode(fullPhoneNumber, activity)
+            },
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp),
+            enabled = !isSendingOtp
+        ) {
+            if (isSendingOtp) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Sending OTP...", fontSize = 16.sp)
+                }
+            } else {
                 Text("Send OTP", fontSize = 16.sp)
             }
         }
-
-
     }
 }

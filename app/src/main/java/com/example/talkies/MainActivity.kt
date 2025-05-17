@@ -20,7 +20,6 @@ import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.talkies.navigation.AppNavigation
 import com.example.talkies.ui.theme.TalkiesTheme
-import com.example.talkies.view.LoginScreen.UserRegistrationScreen
 import com.google.firebase.Firebase
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory

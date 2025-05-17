@@ -1,24 +1,12 @@
 package com.example.talkies.view.LoginScreen
 
-import android.util.Log
 import android.widget.Toast
+import com.example.talkies.R
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,22 +19,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.talkies.R
 import com.example.talkies.navigation.Screens
 import com.example.talkies.state.UiState
 import com.example.talkies.vm.LoginViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun OtpScreen(
     navController: NavHostController,
-    viewModel: LoginViewModel = hiltViewModel(),
+    viewModel: LoginViewModel,
     phoneNumber: String,
     countryCode: String
 ) {
-
     val otp = viewModel.autoRetrievedOtp.collectAsState()
-    val context =  LocalContext.current
+    val context = LocalContext.current
     val authState = viewModel.authState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,8 +43,9 @@ fun OtpScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "Verify ${countryCode}-${phoneNumber}", fontSize = 20.sp,
-            color = colorResource(id = R.color.purple_500),
+            "Verify ${countryCode}-${phoneNumber}",
+            fontSize = 20.sp,
+            color = colorResource(R.color.purple_700),
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(18.dp))
@@ -65,9 +54,7 @@ fun OtpScreen(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "Waiting to automatically detect an SMS sent to $countryCode-$phoneNumber.",
                     color = colorResource(R.color.purple_200),
@@ -79,13 +66,17 @@ fun OtpScreen(
                     color = Color.Blue,
                     modifier = Modifier
                         .padding(top = 4.dp)
-                        .clickable { navController.navigate(Screens.UserRegistrationScreen.routes) }
+                        .clickable {
+                            viewModel.resetAuthState()
+                            navController.navigate(Screens.UserRegistrationScreen.routes)
+                        }
                 )
             }
         }
+
         TextField(
             value = otp.value,
-            onValueChange = { viewModel.onOtpEntered(it) }, // Optional if user edits
+            onValueChange = viewModel::onOtpEntered,
             label = { Text("Enter OTP") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
@@ -96,26 +87,54 @@ fun OtpScreen(
             ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
+
         Spacer(modifier = Modifier.height(10.dp))
-        Button(onClick = {
-            viewModel.verifyCode(otp.value, context = context)
-        }) {
-            Text("Verify OTP")
-        }
-        when(authState){
-            is UiState.Loading->{
-                CircularProgressIndicator()
+
+        Button(
+            onClick = {
+                if (otp.value.length == 6) { // Assuming 6-digit OTP
+                    viewModel.verifyCode(otp.value, context)
+                } else {
+                    Toast.makeText(context, "Please enter 6-digit OTP", Toast.LENGTH_SHORT).show()
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = authState.value !is UiState.Loading
+        ) {
+            if (authState.value is UiState.Loading) {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Verifying...")
+            } else {
+                Text("Verify OTP")
             }
-            is UiState.Failed ->{
-                val message = authState.message
-                Log.e("OTP_ERROR", message)
-                Toast.makeText(context,"Please Enter a valid OTP", Toast.LENGTH_SHORT).show()
-            }
-            is UiState.Success<*> -> {
-                Text("Correct OTP welcome to talkies")
-            }
-            else ->{}
         }
 
+        when (val state = authState.value) {
+            is UiState.Failed -> {
+                Text(
+                    text = state.message,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                LaunchedEffect(state) {
+                    delay(3000)
+                    viewModel.resetAuthState()
+                }
+            }
+            is UiState.Success<*> -> {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screens.HomeScreen.routes) {
+                        popUpTo(Screens.UserRegistrationScreen.routes) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
+            else -> {}
+        }
     }
 }

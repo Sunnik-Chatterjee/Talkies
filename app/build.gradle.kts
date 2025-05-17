@@ -117,4 +117,6 @@ dependencies {
     implementation ("androidx.navigation:navigation-compose:2.7.7") // Use the latest version
     implementation ("androidx.compose.animation:animation:1.6.3")
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    implementation ("com.google.firebase:firebase-auth:22.3.0")
+    implementation ("com.google.android.gms:play-services-safetynet:18.0.1")
 }
