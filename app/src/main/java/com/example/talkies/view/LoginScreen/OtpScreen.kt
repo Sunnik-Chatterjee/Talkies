@@ -127,6 +127,7 @@ fun OtpScreen(
             }
             is UiState.Success<*> -> {
                 LaunchedEffect(Unit) {
+                    viewModel.saveData(true)
                     navController.navigate(Screens.HomeScreen.routes) {
                         popUpTo(Screens.UserRegistrationScreen.routes) {
                             inclusive = true

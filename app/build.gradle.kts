@@ -113,6 +113,9 @@ dependencies {
     implementation ("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
 
     implementation ("androidx.core:core-splashscreen:1.0.1")
+    implementation ("androidx.compose.material:material-icons-extended:1.5.4")
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+
 
     implementation ("androidx.navigation:navigation-compose:2.7.7") // Use the latest version
     implementation ("androidx.compose.animation:animation:1.6.3")

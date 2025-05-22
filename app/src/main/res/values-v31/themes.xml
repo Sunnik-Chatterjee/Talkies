@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Talkies.Splash" parent="Theme.SplashScreen">
+        <!-- Make splash screen icon transparent to remove default animation -->
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent
+        </item>
+        <!-- Background color: your DeepPurple700 -->
+        <item name="android:windowSplashScreenBackground">@color/deep_purple_700</item>
+        <!-- Remove icon background -->
+        <item name="android:windowSplashScreenIconBackgroundColor">
+            @android:color/transparent
+        </item>
+        <!-- After splash screen finishes, switch to normal app theme -->
+        <item name="postSplashScreenTheme">@style/Theme.Talkies</item>
+    </style>
+</resources>

@@ -1,10 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.Talkies" parent="android:Theme.Material.Light.NoActionBar" />
-    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/black</item>
-        <item name="postSplashScreenTheme">@style/Theme.Talkies</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/animated_logo</item>
+    <!-- Your normal app theme -->
+    <style name="Theme.Talkies" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- You can add customizations here later -->
     </style>
 </resources>
