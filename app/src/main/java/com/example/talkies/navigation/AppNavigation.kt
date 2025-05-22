@@ -46,7 +46,7 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
             }
         }
         composable(Screens.HomeScreen.routes) {
-            HomeScreen()
+            HomeScreen(navController = navController)
         }
 
     }
