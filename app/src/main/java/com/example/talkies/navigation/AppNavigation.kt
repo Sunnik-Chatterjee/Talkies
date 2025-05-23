@@ -1,5 +1,7 @@
 package com.example.talkies.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -11,9 +13,11 @@ import androidx.navigation.navArgument
 import com.example.talkies.view.AnimatedSplashScreen
 import com.example.talkies.view.HomeScreen
 import com.example.talkies.view.OtpScreen
+import com.example.talkies.view.UserProfileSetScreen
 import com.example.talkies.view.UserRegistrationScreen
 import com.example.talkies.vm.LoginViewModel
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun AppNavigation(navController: NavHostController = rememberNavController()) {
     val viewModel: LoginViewModel = hiltViewModel()
@@ -24,6 +28,9 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
         }
         composable(Screens.UserRegistrationScreen.routes) {
             UserRegistrationScreen(navController = navController, viewModel = viewModel)
+        }
+        composable (Screens.UserProfileSetScreen.routes){
+            UserProfileSetScreen(navController = navController)
         }
         val detailScreen = Screens.OtpScreen.routes
         composable(

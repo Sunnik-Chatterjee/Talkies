@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,9 +30,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.talkies.R
 import com.example.talkies.vm.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,16 +45,19 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
     val addChannel = remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     Scaffold(floatingActionButton = {
-        Box(
-            modifier = Modifier
-                .padding(16.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.Blue)
-                .clickable {
-                    addChannel.value=true
-                }
-        ){
-            Text("Add Channel", modifier = Modifier.padding(16.dp), color = Color.White)
+        FloatingActionButton(
+            onClick = {
+                /*TODO*/
+            },
+            containerColor = colorResource(R.color.purple_700),
+            modifier = Modifier.size(65.dp),
+            contentColor = Color.White
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.add_chat_icon),
+                contentDescription = null,
+                modifier = Modifier.size(28.dp)
+            )
         }
     }) {
         Box(
@@ -77,11 +86,11 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
 
         }
     }
-    if(addChannel.value){
-        ModalBottomSheet(onDismissRequest = {addChannel.value = false}, sheetState = sheetState) {
+    if (addChannel.value) {
+        ModalBottomSheet(onDismissRequest = { addChannel.value = false }, sheetState = sheetState) {
             AddChannelDialog {
                 viewModel.addChannel(it)
-                addChannel.value=false
+                addChannel.value = false
             }
         }
     }
