@@ -1,7 +1,6 @@
 package com.example.talkies.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -10,9 +9,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.talkies.view.AnimatedSplashScreen
-import com.example.talkies.view.ChatScreen.HomeScreen
-import com.example.talkies.view.LoginScreen.OtpScreen
-import com.example.talkies.view.LoginScreen.UserRegistrationScreen
+import com.example.talkies.view.HomeScreen
+import com.example.talkies.view.OtpScreen
+import com.example.talkies.view.UserRegistrationScreen
 import com.example.talkies.vm.LoginViewModel
 
 @Composable
