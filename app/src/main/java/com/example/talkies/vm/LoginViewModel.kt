@@ -2,6 +2,8 @@ package com.example.talkies.vm
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
+import android.util.Base64
 import android.util.Log
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
@@ -9,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.talkies.data.local.UserPref
 import com.example.talkies.data.model.PhoneAuthUser
 import com.example.talkies.state.UiState
+import com.google.firebase.Firebase
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
@@ -16,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.auth.auth
 import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +27,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -160,27 +165,35 @@ class LoginViewModel @Inject constructor(
                 snapshot.getValue(PhoneAuthUser::class.java)?.let { user ->
                     _authState.value = UiState.Success(user)
                 }
-            } else {
-                // New user - create profile
-                val newUser = PhoneAuthUser(
-                    userId = userId,
-                    phoneNumber = firebaseAuth.currentUser?.phoneNumber ?: ""
-                )
-                saveUserProfile(newUser)
             }
         }.addOnFailureListener {
             _authState.value = UiState.Failed("Failed to fetch user profile")
         }
     }
 
-    fun saveUserProfile(user: PhoneAuthUser) {
-        userRef.child(user.userId).setValue(user)
+    fun saveUserProfile(userId: String, name: String, status: String, profileImage: Bitmap?) {
+        val database = FirebaseDatabase.getInstance().reference
+        val encodedImage = profileImage?.let { convertBitmapToBase64(it) }
+        val userProfile = PhoneAuthUser(
+            userId=userId,
+            name = name,
+            status = status,
+            phoneNumber = Firebase.auth.currentUser?.phoneNumber?:"",
+            profileImage = encodedImage
+        )
+        database.child("users").child(userId).setValue(userProfile)
             .addOnSuccessListener {
-                _authState.value = UiState.Success(user)
+                _authState.value = UiState.Success(userProfile)
             }
             .addOnFailureListener {
                 _authState.value = UiState.Failed("Failed to save profile")
             }
+    }
+    fun convertBitmapToBase64(bitmap: Bitmap): String{
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream)
+        val byteArray= byteArrayOutputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
     // Utility Functions

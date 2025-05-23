@@ -91,7 +91,7 @@ fun OtpScreen(
 
         Button(
             onClick = {
-                if (otp.value.length == 6) { // Assuming 6-digit OTP
+                if (otp.value.length == 6) {
                     viewModel.verifyCode(otp.value, context)
                 } else {
                     Toast.makeText(context, "Please enter 6-digit OTP", Toast.LENGTH_SHORT).show()
@@ -127,7 +127,7 @@ fun OtpScreen(
             is UiState.Success<*> -> {
                 LaunchedEffect(Unit) {
                     viewModel.saveData(true)
-                    navController.navigate(Screens.HomeScreen.routes) {
+                    navController.navigate(Screens.UserProfileSetScreen.routes) {
                         popUpTo(Screens.UserRegistrationScreen.routes) {
                             inclusive = true
                         }
