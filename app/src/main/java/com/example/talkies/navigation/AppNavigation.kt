@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.talkies.view.AnimatedSplashScreen
+import com.example.talkies.view.ChatScreen
 import com.example.talkies.view.HomeScreen
 import com.example.talkies.view.OtpScreen
 import com.example.talkies.view.UserProfileSetScreen
@@ -31,6 +32,11 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
         }
         composable (Screens.UserProfileSetScreen.routes){
             UserProfileSetScreen(navController = navController)
+        }
+        val chatScreen = Screens.ChatScreen.routes
+        composable (
+            route = "$chatScreen/{phoneNumber}/{}"){
+            ChatScreen()
         }
         val detailScreen = Screens.OtpScreen.routes
         composable(

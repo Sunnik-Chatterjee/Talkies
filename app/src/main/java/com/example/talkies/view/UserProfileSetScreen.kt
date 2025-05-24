@@ -108,7 +108,7 @@ fun UserProfileSetScreen(viewModel: LoginViewModel = hiltViewModel(), navControl
                 )
             } else {
                 Image(
-                    painter = painterResource(R.drawable.img),
+                    painter = painterResource(R.drawable.defaultprofileimage),
                     contentDescription = "By default user profile",
                     modifier = Modifier
                         .fillMaxSize()
